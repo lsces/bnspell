@@ -126,7 +126,7 @@
           $s = '"';
                 
           for ($i = 0; $i < $l; $i++) {
-            $c = $arg{$i};
+            $c = $arg[$i];
                     
             if (ord($c) >= ord(' ')) {
                         
@@ -214,7 +214,7 @@
     * @return  string
     */
     function next() {
-      $this->ch = $this->text{$this->at};
+      $this->ch = $this->text[$this->at];
       $this->at++;
       return $this->ch;
     }
@@ -238,9 +238,9 @@
     * handles strings
     * 
     * @access  private
-    * @return  void
+    * @return  string
     */
-    function str() {
+    public function str() {
       $i = '';
       $s = '';
       $t = '';
@@ -302,16 +302,18 @@
       }
       
       $this->error('Bad string');
+		return $s;
+
     }
 
     /**
     * handless arrays
     * 
     * @access  private
-    * @return  void
+    * @return  array
     */
     function arr() {
-      $a = array();
+      $a = [];
 
       if ($this->ch == '[') {
         $this->next();
@@ -576,5 +578,3 @@
       }
     }
   }
-  
-?>
