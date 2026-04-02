@@ -7,7 +7,7 @@
 <div class="form-group">
 	{formlabel label=""}
 	{forminput}
-		<textarea title="spellcheck_icons" accesskey="{$smarty.const.BNSPELL_PKG_URL}spell_checker.php" id="spell_checker1" name="comment0" />This is a tüst of non-ascii characters andd a testt of the spelll checker. Javascript was an unregonized wordd but it's now in the custom dictionary!!</textarea>
+		<textarea title="spellcheck_icons" accesskey="{$smarty.const.BNSPELL_PKG_URL}spell_checker.php" id="spell_checker1" name="comment0" />This is a tÃ¼st of non-ascii characters andd a testt of the spelll checker. Javascript was an unregonized wordd but it's now in the custom dictionary!!</textarea>
 	{/forminput}
 </div>
 <div class="form-group">
