@@ -59,23 +59,23 @@ define(PSPELL_NORMAL,2);       # Normal mode (more suggestions)
 define(PSPELL_BAD_SPELLERS,3); # Slow mode (a lot of suggestions) )
 
 function pspell_config_create($language, $spelling=null, $jargon=null, $encoding='iso8859-1'){
-    return new Pspell($language, $spelling, $jargon, $encoding);
+	return new Pspell($language, $spelling, $jargon, $encoding);
 }
 
 function pspell_config_mode(&$config, $mode){
-    return $config->setMode($mode);
+	return $config->setMode($mode);
 }
 
 function pspell_new_config(&$config){
-    return $config;
+	return $config;
 }
 
 function pspell_check(&$dict,$word){
-    return $dict->check($word);
+	return $dict->check($word);
 }
 
 function pspell_suggest(&$dict, $word){
-    return $dict->suggest($word);
+	return $dict->suggest($word);
 }
 
 /**
@@ -85,163 +85,163 @@ function pspell_suggest(&$dict, $word){
  * @package bnspell
  */
 class Pspell{
-    var $language;
-    var $spelling;
-    var $jargon;
-    var $encoding;
-    var $mode=PSPELL_NORMAL;
-    
-    var $args='';
+	var $language;
+	var $spelling;
+	var $jargon;
+	var $encoding;
+	var $mode=PSPELL_NORMAL;
 
-    /**
-     * Constructor. Works like pspell_config_create()
-     *
-     * @author   Andreas Gohr <andi@splitbrain.org>
-     * @todo     $spelling isn't used
-     */
-    function Pspell($language, $spelling=null, $jargon=null, $encoding='iso8859-1'){
-        $this->language = $language;
-        $this->spelling = $spelling;
-        $this->jargon   = $jargon;
-        $this->encoding = $encoding;
-        $this->_prepareArgs();
-    } 
+	var $args='';
 
-    /**
-     * Set the spelling mode like pspell_config_mode()
-     *
-     * Mode can be PSPELL_FAST, PSPELL_NORMAL or PSPELL_BAD_SPELLER
-     *
-     * @author   Andreas Gohr <andi@splitbrain.org>
-     * @todo     check for valid mode
-     */
-    function setMode($mode){
-        $this->mode = $mode;
-        $this->_prepareArgs();
-        return $mode;
-    }
+	/**
+	 * Constructor. Works like pspell_config_create()
+	 *
+	 * @author   Andreas Gohr <andi@splitbrain.org>
+	 * @todo     $spelling isn't used
+	 */
+	function Pspell($language, $spelling=null, $jargon=null, $encoding='iso8859-1'){
+		$this->language = $language;
+		$this->spelling = $spelling;
+		$this->jargon   = $jargon;
+		$this->encoding = $encoding;
+		$this->_prepareArgs();
+	}
 
-    /**
-     * Prepares the needed arguments for the call to the aspell binary
-     *
-     * No need to call this directly
-     *
-     * @author   Andreas Gohr <andi@splitbrain.org>
-     */
-    function _prepareArgs(){
-        $this->args = '';
+	/**
+	 * Set the spelling mode like pspell_config_mode()
+	 *
+	 * Mode can be PSPELL_FAST, PSPELL_NORMAL or PSPELL_BAD_SPELLER
+	 *
+	 * @author   Andreas Gohr <andi@splitbrain.org>
+	 * @todo     check for valid mode
+	 */
+	function setMode($mode){
+		$this->mode = $mode;
+		$this->_prepareArgs();
+		return $mode;
+	}
 
-        if($this->language){
-            $this->args .= ' --lang='.escapeshellarg($this->language);
-        }else{
-            return false; // no lang no spell
-        }
+	/**
+	 * Prepares the needed arguments for the call to the aspell binary
+	 *
+	 * No need to call this directly
+	 *
+	 * @author   Andreas Gohr <andi@splitbrain.org>
+	 */
+	function _prepareArgs(){
+		$this->args = '';
 
-        #FIXME how to support spelling?
+		if($this->language){
+			$this->args .= ' --lang='.escapeshellarg($this->language);
+		}else{
+			return false; // no lang no spell
+		}
 
-        if($this->$jargon){
-            $this->args .= ' --jargon='.escapeshellarg($jargon);
-        }
+		#FIXME how to support spelling?
 
-        if($this->$encoding){
-            $this->args .= ' --encoding='.escapeshellarg($encoding);
-        }
+		if($this->$jargon){
+			$this->args .= ' --jargon='.escapeshellarg($jargon);
+		}
 
-        switch ($this->mode){
-            case PSPELL_FAST:
-                $this->args .= ' --sug-mode=fast';
-                break;
-            case PSPELL_BAD_SPELLERS:
-                $this->args .= ' --sug-mode=bad-spellers';
-                break;
-            default:
-                $this->args .= ' --sug-mode=normal';
-        }
+		if($this->$encoding){
+			$this->args .= ' --encoding='.escapeshellarg($encoding);
+		}
 
-        return true;
-    }
+		switch ($this->mode){
+			case PSPELL_FAST:
+				$this->args .= ' --sug-mode=fast';
+				break;
+			case PSPELL_BAD_SPELLERS:
+				$this->args .= ' --sug-mode=bad-spellers';
+				break;
+			default:
+				$this->args .= ' --sug-mode=normal';
+		}
 
-    /**
-     * Checks a word for correctness
-     *
-     * This opens a bidirectional pipe to the aspell binary, writes
-     * the given word to STDIN and reads STDOUT for the result
-     *
-     * @returns array of suggestions on wrong spelling, or true on no spellerror
-     *
-     * @author   Andreas Gohr <andi@splitbrain.org>
-     */
-    function suggest($word){
-        $out = '';
-        $err = '';
+		return true;
+	}
 
-        $word = trim($word);
+	/**
+	 * Checks a word for correctness
+	 *
+	 * This opens a bidirectional pipe to the aspell binary, writes
+	 * the given word to STDIN and reads STDOUT for the result
+	 *
+	 * @returns array of suggestions on wrong spelling, or true on no spellerror
+	 *
+	 * @author   Andreas Gohr <andi@splitbrain.org>
+	 */
+	function suggest($word){
+		$out = '';
+		$err = '';
 
-        if(empty($word)) return true;
+		$word = trim($word);
 
-        //prepare file descriptors
-        $descspec = array(
-               0 => array('pipe', 'r'),  // stdin is a pipe that the child will read from
-               1 => array('pipe', 'w'),  // stdout is a pipe that the child will write to
-               2 => array('pipe', 'w')    // stderr is a file to write to
-        );
+		if(empty($word)) return true;
 
-        $process = proc_open(ASPELL_BIN.' -a'.$this->args, $descspec, $pipes);
-        if (is_resource($process)) {
-            //write to stdin
-            fwrite($pipes[0],$word);
-            fclose($pipes[0]);
+		//prepare file descriptors
+		$descspec = [
+			   0 => ['pipe', 'r'],  // stdin is a pipe that the child will read from
+			   1 => ['pipe', 'w'],  // stdout is a pipe that the child will write to
+			   2 => ['pipe', 'w'],    // stderr is a file to write to
+		];
 
-            //read stdout
-            while (!feof($pipes[1])) {
-                $out .= fread($pipes[1], 8192);
-            }
-            fclose($pipes[1]);
+		$process = proc_open(ASPELL_BIN.' -a'.$this->args, $descspec, $pipes);
+		if (is_resource($process)) {
+			//write to stdin
+			fwrite($pipes[0],$word);
+			fclose($pipes[0]);
 
-            //read stderr
-            while (!feof($pipes[2])) {
-                $err .= fread($pipes[2], 8192);
-            }
-            fclose($pipes[2]);
+			//read stdout
+			while (!feof($pipes[1])) {
+				$out .= fread($pipes[1], 8192);
+			}
+			fclose($pipes[1]);
 
-            if(proc_close($process) != 0){
-                //something went wrong
-                trigger_error("aspell returned an error: $err", E_USER_WARNING);
-                return array();
-            }
+			//read stderr
+			while (!feof($pipes[2])) {
+				$err .= fread($pipes[2], 8192);
+			}
+			fclose($pipes[2]);
 
-            //parse output
-            $lines = split("\n",$out);
-            foreach ($lines as $line){
-                $line = trim($line);
-                if(empty($line))    continue;       // empty line
-                if($line[0] == '@') continue;       // comment
-                if($line[0] == '*') return true;    // no mistakes made
-                if($line[0] == '#') return array(); // mistake but no suggestions
-                if($line[0] == '&'){
-                    $line = preg_replace('/&.*?: /','',$line);
-                    return split(', ',$line);
-                }
-            }
-            return true; // shouldn't be reached
-        }
-        //opening failed
-        trigger_error("Could not run aspell '".ASPELL_BIN."'", E_USER_WARNING);
-        return array();
-    }
+			if(proc_close($process) != 0){
+				//something went wrong
+				trigger_error("aspell returned an error: $err", E_USER_WARNING);
+				return [];
+			}
 
-    /**
-     * Check if a word is misspelled like pspell_check
-     *
-     * @author   Andreas Gohr <andi@splitbrain.org>
-     */
-    function check($word){
-        if(is_array($this->suggest($word))){
-            return false;
-        }else{
-            return true;
-        }
-    }
+			//parse output
+			$lines = split("\n",$out);
+			foreach ($lines as $line){
+				$line = trim($line);
+				if(empty($line))    continue;       // empty line
+				if($line[0] == '@') continue;       // comment
+				if($line[0] == '*') return true;    // no mistakes made
+				if($line[0] == '#') return []; // mistake but no suggestions
+				if($line[0] == '&'){
+					$line = preg_replace('/&.*?: /','',$line);
+					return split(', ',$line);
+				}
+			}
+			return true; // shouldn't be reached
+		}
+		//opening failed
+		trigger_error("Could not run aspell '".ASPELL_BIN."'", E_USER_WARNING);
+		return [];
+	}
+
+	/**
+	 * Check if a word is misspelled like pspell_check
+	 *
+	 * @author   Andreas Gohr <andi@splitbrain.org>
+	 */
+	function check($word){
+		if(is_array($this->suggest($word))){
+			return false;
+		}
+			return true;
+
+	}
 }
 
 ?>

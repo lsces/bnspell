@@ -42,15 +42,15 @@ if (!(isset($_GET["cpaint_function"]) || isset($_POST["cpaint_function"]))) {
 		<tr><td height="10" bgcolor="#9999CC" class="style3"></td></tr>
 		<tr><td bgcolor="#FFFFFF" class="style3"><blockquote>';
 	$debug_html_end = "</blockquote></td></tr></table><br><iframe name=\"results\" class=\"style3\" width=\"100%\" height=\"100%\" scrolling=\"yes\" allowtransparency=\"false\" style=\"background-color:  #FFFFFF\"></iframe></body></html>";
-	
+
 	// get function names and function variables/values
 	$functionArray = getCallableCode();
-	
+
 	$debug_body = "";
 	if (count($functionArray) > 0) {
 		foreach ($functionArray as $func_name=>$func_variables) {
 			$debug_body = $debug_body . "<form method=\"get\" target=\"results\"><a href=\"javascript:showForm('" . $func_name . "_form');\">" . $func_name . "</a><div id=\"" . $func_name . "_form\" style=\"display:  none;\">";
-			
+
 			$debug_body = $debug_body . '<table border="0">';
 			if ( count($func_variables) > 0) {
 				foreach ($func_variables as $var_name=>$var_preset) {
@@ -63,7 +63,7 @@ if (!(isset($_GET["cpaint_function"]) || isset($_POST["cpaint_function"]))) {
 			$debug_body = $debug_body . "<tr><td colspan=\"3\"><input type=\"hidden\" name=\"cpaint_function\" value=\"" . $func_name . "\"><input type=\"submit\"></td></tr></table></div></form>";
 		}
 	}
-	
+
 	print($debug_html_start . $debug_body . $debug_html_end);
 	die();
 }
@@ -78,7 +78,7 @@ function getCallableCode() {
 		$line = trim($fileLines[$i]);
 		if (substr($line, 0, 9) == "FUNCTION " || substr($line,0,9) == "function ") {
 			$match[] = $line;
-		}		
+		}
 	}
 	for ($i = 0; $i < sizeof($match); $i++) {
 		$line = str_replace("function ", "", $match[$i]);
@@ -86,11 +86,11 @@ function getCallableCode() {
 		$line = str_replace("{", "", $line);
 		$parts = explode("(", $line);
 		$func_name = trim($parts[0]);
-		
+
 		$Tempargs = explode(")", $parts[1]);
 		$args = explode(",", $Tempargs[0]);
 		$argSize = sizeof($args);
-		
+
 		// check args for preset values
 		if ($argSize > 0) {
 			foreach ($args as $arg) {

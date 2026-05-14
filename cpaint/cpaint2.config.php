@@ -23,9 +23,9 @@
 */
 
 //---- proxy settings ----------------------------------------------------------
-	$cpaint2_config["proxy.security.use_whitelist"] = true;		
+	$cpaint2_config["proxy.security.use_whitelist"] = true;
 				// Use the whitelist for allowed URLs?
-					
+
 //---- proxy security whitelist ------------------------------------------------
 	/* 	whitelist data should be added to the variable $cpaint2_proxy_whitelist[]
 			example: $cpaint2_proxy_whitelist[] = "example.com/test.php";
@@ -33,6 +33,6 @@
 			example: $cpaint2_proxy_whitelist[] = "example.com";
 			** Omit http:// and https:// from the URL **
 	*/
-	$cpaint2_proxy_whitelist[] = $_SERVER['HTTP_HOST']; 	// this server	
+	$cpaint2_proxy_whitelist[] = $_SERVER['HTTP_HOST']; 	// this server
 
 ?>

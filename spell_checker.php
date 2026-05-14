@@ -97,7 +97,6 @@ $cp->register('addWord');
 $cp->start();
 $cp->return_data();
 
-
 /*************************************************************
  * showSuggestions($word, $id)
  *
@@ -113,16 +112,16 @@ function showSuggestions($word, $id)
 	global $editablePersonalDict; //bool to set editability of personal dictionary
 	global $pspell_link; //the global link to the pspell module
 	global $cp; //the CPAINT object
-	
+
 	$retVal = "";
-	
+
 	$suggestions = pspell_suggest($pspell_link, $word);  //an array of all the suggestions that psepll returns for $word.
-	
+
 	// If the number of suggestions returned by pspell is less than the maximum
 	// number, just use the number of suggestions returned.
 	$numSuggestions = count($suggestions);
 	$tmpNum = min($numSuggestions, MAX_SUGGESTIONS);
-			
+
 	if($tmpNum > 0)
 	{
 		//this creates the table of suggestions.
@@ -131,7 +130,7 @@ function showSuggestions($word, $id)
 		{
 			$retVal .= "<div class=\"suggestion\" onclick=\"replaceWord('" . addslashes_custom($id) . "', '" . addslashes($suggestions[$i]) . "'); return false;\">" . $suggestions[$i] . "</div>";
 		}
-	
+
 		if($editablePersonalDict)
 		{
 			$retVal .= "<div class=\"addtoDictionary\" onclick=\"addWord('" . addslashes_custom($id) . "'); return false;\">Add To Dictionary</div>";
@@ -141,11 +140,10 @@ function showSuggestions($word, $id)
 	{
 		$retVal .= "No Suggestions";
 	}
-	
-	$cp->set_data($retVal);  //the return value - a string containing the table of suggestions.
-	
-} // end showSuggestions
 
+	$cp->set_data($retVal);  //the return value - a string containing the table of suggestions.
+
+} // end showSuggestions
 
 /*************************************************************
  * spellCheck($string)
@@ -170,21 +168,21 @@ function spellCheck($string, $varName)
 	global $pspell_link; //the global link to the pspell module
 	global $cp; //the CPAINT object
 	$retVal = "";
-   
-   	//$string = stripslashes_custom($string); //we only need to strip slashes if magic quotes are on
 
-   	$string = remove_word_junk($string);
+	//$string = stripslashes_custom($string); //we only need to strip slashes if magic quotes are on
 
-   	//make all the returns in the text look the same
+	$string = remove_word_junk($string);
+
+	//make all the returns in the text look the same
 	$string = preg_replace("/\r?\n/", "\n", $string);
-   
-   	//splits the string on any html tags, preserving the tags and putting them in the $words array
-   	$words = preg_split("/(<[^<>]*>)/", $string, -1, PREG_SPLIT_DELIM_CAPTURE);
-	   
-   	$numResults = count($words); //the number of elements in the array.
 
-	$misspelledCount = 0;	
-   
+	//splits the string on any html tags, preserving the tags and putting them in the $words array
+	$words = preg_split("/(<[^<>]*>)/", $string, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+	$numResults = count($words); //the number of elements in the array.
+
+	$misspelledCount = 0;
+
 	//this loop looks through the words array and splits any lines of text that aren't html tags on space, preserving the spaces.
 	for($i=0; $i<$numResults; $i++){
 		// Words alternate between real words and html tags, starting with words.
@@ -198,19 +196,19 @@ function spellCheck($string, $varName)
 			{
 				preg_match("/[A-Z']{1,16}/i", $words[$i][$j], $tmp); //get the word that is in the array slot $i
 				$tmpWord = $tmp[0]; //should only have one element in the array anyway, so it's just assign it to $tmpWord
-				
+
 				//And we replace the word in the array with the span that highlights it and gives it an onClick parameter to show the suggestions.
 				if(!pspell_check($pspell_link, $tmpWord))
 				{
 					$onClick = "onclick=\"setCurrentObject(" . $varName . "); showSuggestions('" . addslashes($tmpWord) . "', '" . $varName . "_" . $misspelledCount . "_" . addslashes($tmpWord) . "'); return false;\"";
-					$words[$i][$j] = str_replace($tmpWord, "<span " . $onClick . " id=\"" . $varName . "_" . $misspelledCount . "_" . $tmpWord . "\" class=\"highlight\">" . stripslashes($tmpWord) . "</span>", $words[$i][$j]); 
+					$words[$i][$j] = str_replace($tmpWord, "<span " . $onClick . " id=\"" . $varName . "_" . $misspelledCount . "_" . $tmpWord . "\" class=\"highlight\">" . stripslashes($tmpWord) . "</span>", $words[$i][$j]);
 					$misspelledCount++;
 				}
-				
+
 				$words[$i][$j] = str_replace("\n", "<br />", $words[$i][$j]); //replace any breaks with <br />'s, for html display
 			}//end for $j
 		}//end if
-		
+
 		else //otherwise, we wrap all the html tags in comments to make them not displayed
 		{
 			$words[$i] = str_replace("<", "<!--<", $words[$i]);
@@ -220,23 +218,23 @@ function spellCheck($string, $varName)
 
 	$words = flattenArray($words); //flatten the array to be one dimensional.
 	$numResults = count($words); //the number of elements in the array after it's been flattened.
-  	
-	$string = ""; //return string  
-   
+
+	$string = ""; //return string
+
 	//if there were no misspellings, start the string with a 0.
 	if($misspelledCount == 0)
 	{
 		$string = "0";
 	}
-   	
+
 	else //else, there were misspellings, start the string with a 1.
 	{
-   		$string = "1";
-   	}
-	
+		$string = "1";
+	}
+
 	// Concatenate all the words/tags/etc. back into a string and append it to the result.
 	$string .= implode('', $words);
-	
+
 	//remove comments from around all html tags except for <a> because we don't want the links to be clickable
 	//but we want the html to be rendered in the div for preview purposes.
 	$string = preg_replace("/<!--<br( [^>]*)?>-->/i", "<br />", $string);
@@ -255,11 +253,10 @@ function spellCheck($string, $varName)
 	$string = preg_replace("/<!--<li( [^>]*)?>-->/i", "<li>", $string);
 	$string = preg_replace("/<!--<\/li>-->/i", "</li>", $string);
 	$string = preg_replace("/<!--<img (?:[^>]+ )?src=\"?([^\"]*)\"?[^>]*>-->/i", "<img src=\"\\1\" />", $string);
-		
+
 	$cp->set_data($string);  //return value - string containing all the markup for the misspelled words.
 
 } // end spellCheck
-
 
 /*************************************************************
  * addWord($str)
@@ -279,16 +276,14 @@ function addWord($str)
 	{
 		$retVal = "Save successful!";
 	}
-	
+
 	else
 	{
 		$retVal = "Save Failed!";
 	}
-	
+
 	$cp->set_data($retVal);
 } // end addWord
-
-
 
 /*************************************************************
  * flattenArray($array)
@@ -302,10 +297,10 @@ function addWord($str)
  *************************************************************/
 function flattenArray($array)
 {
-	$flatArray = array();
+	$flatArray = [];
 	foreach($array as $subElement)
 	{
-    	if(is_array($subElement))
+		if(is_array($subElement))
 		{
 			$flatArray = array_merge($flatArray, flattenArray($subElement));
 		}
@@ -314,10 +309,9 @@ function flattenArray($array)
 			$flatArray[] = $subElement;
 		}
 	}
-	
+
 	return $flatArray;
 } // end flattenArray
-
 
 /*************************************************************
  * stripslashes_custom($string)
@@ -336,10 +330,9 @@ function stripslashes_custom($string)
 	{
 		return stripslashes($string);
 	}
-	else
-	{
+
 		return $string;
-	}
+
 } // end stripslashes_custom
 
 /*************************************************************
@@ -359,12 +352,10 @@ function addslashes_custom($string)
 	{
 		return addslashes($string);
 	}
-	else
-	{
-		return $string;
-	}
-} // end addslashes_custom
 
+		return $string;
+
+} // end addslashes_custom
 
 /*************************************************************
  * remove_word_junk($t)
@@ -378,7 +369,7 @@ function addslashes_custom($string)
  *************************************************************/
 function remove_word_junk($t)
 {
-	$a=array(
+	$a=[
 	"\xe2\x80\x9c"=>'"',
 	"\xe2\x80\x9d"=>'"',
 	"\xe2\x80\x99"=>"'",
@@ -392,19 +383,18 @@ function remove_word_junk($t)
 	"\223"=>'"',
 	"\224"=>'"',
 	"\x97"=>"---",
-	"\x96"=>"--"
-	);
+	"\x96"=>"--",
+	];
 
 	foreach($a as $k=>$v){
 		$oa[]=$k;
 		$ra[]=$v;
 	}
-	
+
 	$t=trim(str_replace($oa,$ra,$t));
 	return $t;
 
 } // end remove_word_junk
-
 
 /*************************************************************
  * switchText($string)
@@ -431,14 +421,14 @@ function switchText($string)
 	global $cp; //the CPAINT object
 	$string = remove_word_junk($string);
 	$string = preg_replace("/<!--/", "", $string);
-	$string = preg_replace("/-->/", "", $string);	
+	$string = preg_replace("/-->/", "", $string);
 	$string = preg_replace("/\r?\n/", " ", $string);
 	$string = stripslashes_custom($string); //we only need to strip slashes if magic quotes are on
 	$string = strip_tags($string, $allowed_html);
 	$string = preg_replace('{&lt;/?span.*?&gt;}i', '', $string);
 	$string = html_entity_decode($string);
 	$cp->set_data($string); //the return value
-	
+
 } // end switchText
 
 ?>

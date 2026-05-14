@@ -1,8 +1,8 @@
 <?php
-$registerHash = array(
+$registerHash = [
 	'package_name' => 'bnspell',
 	'package_path' => dirname( dirname( __FILE__ ) ).'/',
-);
+];
 $gBitSystem->registerPackage( $registerHash );
 
 if( $gBitSystem->isPackageActive( 'bnspell' ) ) {

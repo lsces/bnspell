@@ -14,6 +14,6 @@
  */
 require_once( '../kernel/includes/setup_inc.php' );
 
-$gBitSystem->display( 'bitpackage:bnspell/bnspell_example.tpl' , NULL, array( 'display_mode' => 'display' ));
+$gBitSystem->display( 'bitpackage:bnspell/bnspell_example.tpl' , NULL, [ 'display_mode' => 'display' ]);
 
 ?>
